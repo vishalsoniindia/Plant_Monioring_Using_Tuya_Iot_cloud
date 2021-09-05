@@ -71,6 +71,8 @@ void setup()
   //register upload all DP callback function
   my_device.dp_update_all_func_register(dp_update_all);
 
+  soil_moisture();
+
   delay(300);
   last_time = millis();
 }
@@ -103,22 +105,17 @@ void loop()
 
   /* get the temperature and humidity */
   get_sht30_value(&temperature, &humidity);
-
-  if(hulk_moisture== 99){
-    hulk_moisture = 0;
-  }else{
-    hulk_moisture ++;
-  }
-  if(thor_moisture == 0){
-    thor_moisture = 99;
-  }else{
-    thor_moisture --;
-  }
+  
+  soil_moisture();
 
   Serial.print("temperature :- ");       //print on serial for debuging
   Serial.println(temperature);
   Serial.print("humidity :- ");
   Serial.println(humidity);
+  Serial.print("Hulk's Moisture:- ");       //print on serial for debuging
+  Serial.println(analogRead(hulk_moisture_pin));
+  Serial.print("Thor's Moisture:- ");
+  Serial.println(analogRead(thor_moisture_pin));
 
   /* report the temperature and humidity */
   if ((my_device.mcu_get_wifi_work_state() == WIFI_CONNECTED) || (my_device.mcu_get_wifi_work_state() == WIFI_CONN_CLOUD)) {
@@ -219,8 +216,8 @@ void dp_update_all(void)
 }
 
 void soil_moisture(){
- hulk_moisture = map(analogRead(hulk_moisture_pin),300,1000,100,0);
- thor_moisture = map(analogRead(thor_moisture_pin),300,1000,100,0);
+ hulk_moisture = map(analogRead(hulk_moisture_pin),300,800,100,0);
+ thor_moisture = map(analogRead(thor_moisture_pin),300,800,100,0);
 
  if(hulk_moisture < 0){
   hulk_moisture = 0;
